@@ -1,0 +1,3 @@
+rootProject.name = "ScrollTableView"
+include ':example'
+include ':scrolltableview'

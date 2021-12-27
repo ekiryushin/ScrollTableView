@@ -1,0 +1,5 @@
+<resources>
+    <color name="dived_color">#2B2B2B</color> <!-- цвет линий между ячейками -->
+    <color name="row_delete_color">#939393</color> <!-- цвет удаленной строки -->
+    <color name="cell_edit_color">#C1FAB1</color> <!-- цвет измененной строки -->
+</resources>
