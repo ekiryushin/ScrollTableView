@@ -16,22 +16,21 @@ object Version {
     const val MATERIAL = "1.4.0"
     const val CONSTRAIN = "2.1.0"
     const val APPCOMPAT = "1.3.1"
-//    const val RECYCLERVIEW = "1.2.1"
 
     const val KOTLIN = "1.5.31"
     const val KOTLIN_CORE = "1.6.0"
     const val BUILD_GRADLE = "7.0.2"
-
-//    const val ROOM = "2.3.0"
-//
-//    const val COLOR_PICKER = "1.2.5"
-//    const val CHART_LIBRARY = "v3.1.0"
-//    const val CICERONE = "7.1"
-//    const val COROUTINES = "1.5.1"
-//    const val KOIN = "3.1.2"
+    const val KOTLIN_GRADLE_PLUGIN = "1.5.20"
 }
 
 //модули приложения
 object Module {
     const val SCROLL_TABLE_VIEW = ":scrolltableview"
+}
+
+//параметры для публикации библиотеки
+object Publish {
+    const val GROUP_ID = "io.github.ekiryushin"
+    const val ARTIFACT_ID = "scrolltableview"
+    const val VERSION = "1.0.1"
 }
