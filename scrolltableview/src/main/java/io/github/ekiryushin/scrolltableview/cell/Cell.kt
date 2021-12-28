@@ -1,4 +1,4 @@
-package com.github.ekiryushin.scrolltableview.cell
+package io.github.ekiryushin.scrolltableview.cell
 
 /** Содержимое каждой ячейки. */
 data class Cell (
@@ -17,7 +17,8 @@ data class Cell (
      * <li>CellView.EDIT_NUMBER - значение можно редактировать как число.</li>
      * </ol>
      */
-    val viewed: CellView = CellView.ONLY_READ) {
+    val viewed: CellView = CellView.ONLY_READ
+) {
 
     /**
      * Состояние значения ячейки.

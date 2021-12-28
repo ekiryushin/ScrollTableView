@@ -1,11 +1,10 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview.scrolled
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.HorizontalScrollView
 import android.widget.ScrollView
 
-class HorizontalScrollTableView: HorizontalScrollView {
+class VerticalScrollTableView: ScrollView {
     constructor(context: Context): super(context)
     constructor(context: Context, attrs: AttributeSet): super(context, attrs)
 

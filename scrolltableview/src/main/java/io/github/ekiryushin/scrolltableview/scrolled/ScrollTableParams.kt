@@ -1,4 +1,6 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview.scrolled
+
+import io.github.ekiryushin.scrolltableview.R
 
 /** Параметры для отображения таблицы. */
 data class ScrollTableParams (

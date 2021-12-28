@@ -1,23 +1,23 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview
 
 import android.view.View
-import com.github.ekiryushin.scrolltableview.cell.CellView
+import io.github.ekiryushin.scrolltableview.cell.RowCell
 
 interface ViewListener {
-    /** Задать обработчик клика по значению.
+    /** Задать обработчик клика по строке.
      * @param rowId индекс строки в данных, где расположена ячейка
      * @param columnId индекс столбца в данных, где расположена ячейка
-     * @param title заголовок для значения в окне редактирования
-     * @param value значение ячейки в окне редактирования
-     * @param viewed вариант отображения ячейки для корректной настройки окна редактирования
+     * @param header заголовок таблицы
+     * @param row строка со значениями для редактирования
+     * @param countColumns количество колонок в таблице
      * @param view непосредственно ячейка, по которой нажали
      */
-    fun setValueClickListener(
+    fun setRowClickListener(
         rowId: Int,
         columnId: Int,
-        title: String?,
-        value: String?,
-        viewed: CellView,
+        header: RowCell?,
+        row: RowCell?,
+        countColumns: Int,
         view: View? = null)
 
     /** Установить фон строки в зависимости от того удалена она или нет.

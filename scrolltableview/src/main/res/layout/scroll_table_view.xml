@@ -13,7 +13,7 @@
     </TableLayout>
 
     <!-- прокручиваемый заголовок столбцов (шапка таблицы) -->
-    <com.github.ekiryushin.scrolltableview.HorizontalScrollTableView
+    <io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView
         android:id="@+id/table_data_scroll_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,10 +30,10 @@
                 android:divider="@color/dived_color"
                 android:showDividers="middle"/>
         </TableLayout>
-    </com.github.ekiryushin.scrolltableview.HorizontalScrollTableView>
+    </io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView>
 
     <!-- закрепленные столбцы -->
-    <com.github.ekiryushin.scrolltableview.VerticalScrollTableView
+    <io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView
         android:id="@+id/table_data_scroll_fix"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -45,16 +45,16 @@
             android:layout_height="wrap_content"
             android:divider="@color/dived_color"
             android:showDividers="middle"/>
-    </com.github.ekiryushin.scrolltableview.VerticalScrollTableView>
+    </io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView>
 
     <!-- данные -->
-    <com.github.ekiryushin.scrolltableview.VerticalScrollTableView
+    <io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView
         android:id="@+id/table_data_scroll_row_data"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/table_data_scroll_header"
         android:layout_toEndOf="@+id/table_data_scroll_fix">
-        <com.github.ekiryushin.scrolltableview.HorizontalScrollTableView
+        <io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView
             android:id="@+id/table_data_scroll_column_data"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -64,6 +64,6 @@
                 android:layout_height="match_parent"
                 android:divider="@color/dived_color"
                 android:showDividers="middle"/>
-        </com.github.ekiryushin.scrolltableview.HorizontalScrollTableView>
-    </com.github.ekiryushin.scrolltableview.VerticalScrollTableView>
+        </io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView>
+    </io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView>
 </merge>

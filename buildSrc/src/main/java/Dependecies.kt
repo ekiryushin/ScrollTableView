@@ -1,6 +1,6 @@
 //параметры для сборки
 object Config {
-    const val APPLICATION_ID = "com.github.ekiryushin.scrolltableview.example"
+    const val APPLICATION_ID = "io.github.ekiryushin.scrolltableview.example"
     const val BUILD_TOOLS_VERSION = "30.0.2"
     const val COMPILE_SDK = 31
     const val MIN_SDK = 23
@@ -14,6 +14,7 @@ object Config {
 //версии подключаемых библиотек
 object Version {
     const val MATERIAL = "1.4.0"
+    const val FRAGMENT_KTX = "1.4.0"
     const val CONSTRAIN = "2.1.0"
     const val APPCOMPAT = "1.3.1"
 
@@ -32,5 +33,5 @@ object Module {
 object Publish {
     const val GROUP_ID = "io.github.ekiryushin"
     const val ARTIFACT_ID = "scrolltableview"
-    const val VERSION = "1.0.1"
+    const val VERSION = "1.0.2"
 }

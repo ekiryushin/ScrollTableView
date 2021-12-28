@@ -1,4 +1,4 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview.scrolled
 
 import android.view.View
 

@@ -1,4 +1,4 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,15 +6,17 @@ import android.widget.ImageView
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.core.view.get
 import androidx.core.view.isVisible
-import com.github.ekiryushin.scrolltableview.cell.CellView
-import com.github.ekiryushin.scrolltableview.cell.DataStatus
-import com.github.ekiryushin.scrolltableview.cell.RowCell
+import io.github.ekiryushin.scrolltableview.cell.DataStatus
+import io.github.ekiryushin.scrolltableview.cell.RowCell
+import io.github.ekiryushin.scrolltableview.scrolled.ScrollTableParams
 
 /** Презентер отображения таблицы */
 class ScrollTableViewPresenter (
     private var params: ScrollTableParams,
-    private val viewListener: ViewListener) {
+    private val viewListener: ViewListener
+) {
 
     //данные для отображения
     private var headers: RowCell? = null
@@ -42,7 +44,8 @@ class ScrollTableViewPresenter (
         inflater: LayoutInflater,
         tableFix: TableLayout,
         tableData: TableLayout,
-        row: RowCell) {
+        row: RowCell
+    ) {
         data?.let { rows ->
             //проставляем статус на строку
             row.status = DataStatus.ADD
@@ -122,14 +125,7 @@ class ScrollTableViewPresenter (
                     }
 
                     //обновим обработчик клика
-                    if(cell.viewed != CellView.ONLY_READ) {
-                        viewListener.setValueClickListener(
-                            rowId,
-                            columnId,
-                            headers?.columns?.get(columnId)?.value,
-                            value,
-                            cell.viewed)
-                    }
+                    viewListener.setRowClickListener(rowId, columnId, headers, rows[rowId], countColumns)
                 }
             }
         }
@@ -162,6 +158,11 @@ class ScrollTableViewPresenter (
         //наполняем таблицы сформированными строками
         tableFix.addView(tableRowFix)
         tableData.addView(tableRowData)
+
+        //сразу отурываем окно ввода данных
+        if (selectedCell) {
+            clickOnNewRow(tableRowFix, tableRowData)
+        }
     }
 
     //навешать обработчики на иконки удаления и восстановления строки
@@ -215,16 +216,12 @@ class ScrollTableViewPresenter (
         //обходим все столбцы с данными
         for (columnId in 0 until countColumns) {
             val view = inflater.inflate(R.layout.item_table_data, null)
-            var viewed = CellView.EDIT_STRING
-            var value: String? = null
 
             if (columnId <= row.columns.size) {
                 val cell = row.columns[columnId]
 
                 val textView = view.findViewById<TextView>(R.id.table_data_item)
                 cell.value?.let { textView.text = it }
-                value = cell.value
-                viewed = cell.viewed
 
                 //выделим цветом
                 if (selectedCell) {
@@ -233,21 +230,20 @@ class ScrollTableViewPresenter (
             }
 
             //навешиваем обработчик клика
-            if(viewed != CellView.ONLY_READ) {
-                viewListener.setValueClickListener(
-                    rowId,
-                    columnId,
-                    headers?.columns?.get(columnId)?.value,
-                    value,
-                    viewed,
-                    view)
-            }
+            viewListener.setRowClickListener(rowId, columnId, headers, row, countColumns, view)
 
             if (columnId < params.countFixColumn) {
                 tableRowFix.addView(view)
             } else {
                 tableRowData.addView(view)
             }
+        }
+    }
+
+    //нажатие по вновь созданной строке
+    private fun clickOnNewRow(tableRowFix: TableRow, tableRowData: TableRow) {
+        if (tableRowData.childCount > 0) {
+            tableRowData[0].callOnClick()
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.github.ekiryushin.scrolltableview.example
+package io.github.ekiryushin.scrolltableview.example
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.github.ekiryushin.scrolltableview.cell.Cell
-import com.github.ekiryushin.scrolltableview.cell.CellView
-import com.github.ekiryushin.scrolltableview.cell.RowCell
-import com.github.ekiryushin.scrolltableview.example.databinding.ActivityMainBinding
+import io.github.ekiryushin.scrolltableview.cell.Cell
+import io.github.ekiryushin.scrolltableview.cell.CellView
+import io.github.ekiryushin.scrolltableview.cell.RowCell
+import io.github.ekiryushin.scrolltableview.example.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             columnsData.add(Cell(id = id++, value = "$ind.10.2021", viewed = CellView.EDIT_STRING))
             //добавляем колонки с остальными значениями
             for (indV in 1..10) {
-                columnsData.add(Cell(id = id++, value = (10..25).random().toString(), viewed = CellView.EDIT_NUMBER))
+                columnsData.add(Cell(id = id++, value = (10..25).random().toFloat().toString(), viewed = CellView.EDIT_NUMBER))
             }
             data.add(RowCell(columnsData))
         }

@@ -1,4 +1,4 @@
-package com.github.ekiryushin.scrolltableview.cell
+package io.github.ekiryushin.scrolltableview.cell
 
 /** Варианты отображения данных в ячейке */
 enum class CellView {

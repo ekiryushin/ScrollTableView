@@ -1,19 +1,20 @@
-package com.github.ekiryushin.scrolltableview
+package io.github.ekiryushin.scrolltableview
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.PendingIntent.getActivity
 import android.content.Context
-import android.content.DialogInterface
-import android.text.Editable
 import android.text.InputType
-import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import com.github.ekiryushin.scrolltableview.cell.CellView
-import com.github.ekiryushin.scrolltableview.cell.RowCell
+import com.google.android.material.textfield.TextInputLayout
+import io.github.ekiryushin.scrolltableview.cell.CellView
+import io.github.ekiryushin.scrolltableview.cell.RowCell
+import io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView
+import io.github.ekiryushin.scrolltableview.scrolled.OnScrollListener
+import io.github.ekiryushin.scrolltableview.scrolled.ScrollTableParams
+import io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView
 
 /** Основной класс по отображения таблицы. */
 class ScrollTableView: RelativeLayout, ViewListener {
@@ -64,59 +65,24 @@ class ScrollTableView: RelativeLayout, ViewListener {
         updateColumnWidth(trHeader, trFirstRowData)
     }
 
-    /** Задать обработчик клика по значению.
+    /** Задать обработчик клика по строке.
      * @param rowId индекс строки в данных, где расположена ячейка
      * @param columnId индекс столбца в данных, где расположена ячейка
-     * @param title заголовок для значения в окне редактирования
-     * @param value значение ячейки в окне редактирования
-     * @param viewed вариант отображения ячейки для корректной настройки окна редактирования
+     * @param header заголовок таблицы
+     * @param row строка со значениями для редактирования
+     * @param countColumns количество колонок в таблице
      * @param view непосредственно ячейка, по которой нажали
      */
-    override fun setValueClickListener(
+    override fun setRowClickListener(
         rowId: Int,
         columnId: Int,
-        title: String?,
-        value: String?,
-        viewed: CellView,
+        header: RowCell?,
+        row: RowCell?,
+        countColumns: Int,
         view: View?) {
-        inflater?.let {
+        row?.let {
             val curView = view ?: getCellView(rowId, columnId)
-            curView?.setOnClickListener { v ->
-                val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-                val viewDialog = it.inflate(R.layout.item_table_data_edit, null)
-                //задаем заголовок
-                title?.let { t ->
-                    viewDialog.findViewById<TextView>(R.id.table_data_item_edit_title)?.text = t
-                }
-                //задаем значение
-                val edit: EditText = viewDialog.findViewById(R.id.table_data_item_edit)
-                when (viewed) {
-                    //ячейка должна быть с полем ввода числа
-                    CellView.EDIT_NUMBER -> {
-                        edit.inputType = InputType.TYPE_CLASS_NUMBER
-                        value?.let {
-                            val valueCheck: String? = try {
-                                //небольшая проверка на то, что у нас реально число
-                                it.toFloat().toString()
-                            } catch (e: Exception) {
-                                null
-                            }
-                            edit.setText(valueCheck)
-                        }
-                    }
-
-                    //ячейка должна быть с полем ввода текста
-                    else -> edit.setText(value)
-                }
-
-                //задаем параметры, чтобы потом по ним обновить данные в таблице
-                edit.setTag(R.id.tag_row_id, rowId)
-                edit.setTag(R.id.tag_column_id, columnId)
-
-                builder.setView(viewDialog)
-                //настраиваем кнопки и показываем диалог
-                showDialog(builder, edit)
-            }
+            curView?.setOnClickListener(cellClickListener(rowId, header, it, countColumns))
         }
     }
 
@@ -167,7 +133,7 @@ class ScrollTableView: RelativeLayout, ViewListener {
     /** Прокрутить список вниз */
     override fun scrollToEnd() {
         val scrollRowData: VerticalScrollTableView = this.findViewById(R.id.table_data_scroll_row_data)
-        scrollRowData.fullScroll(ScrollView.FOCUS_DOWN)
+        scrollRowData.post { scrollRowData.fullScroll(ScrollView.FOCUS_DOWN) }
     }
 
     /** Задать список заголовков.
@@ -277,11 +243,13 @@ class ScrollTableView: RelativeLayout, ViewListener {
     }
 
     /** Показать окно для изменения значения */
-    private fun showDialog(builder: AlertDialog.Builder, edit: EditText) {
-        builder.setCancelable(false)
+    private fun showDialog(builder: AlertDialog.Builder, view: LinearLayout) {
+        builder
+            .setCancelable(false)
+            .setTitle(R.string.edit_title)
             .setPositiveButton(
                 context.getString(R.string.button_success)
-            ) { _, _ -> applyDialog(edit) }
+            ) { _, _ -> applyDialog(view) }
             .setNegativeButton(
                 context.getString(R.string.button_cancel)
             ) { dialog, _ -> dialog.cancel() }
@@ -290,19 +258,25 @@ class ScrollTableView: RelativeLayout, ViewListener {
     }
 
     /** Сохранение значения */
-    private fun applyDialog(edit: EditText) {
+    private fun applyDialog(view: LinearLayout) {
         //получаем координаты ячейки в таблице
-        val rowId: Int? = edit.getTag(R.id.tag_row_id)?.toString()?.toInt()
-        val columnId: Int? = edit.getTag(R.id.tag_column_id)?.toString()?.toInt()
-        val value = edit.text.toString()
+        val rowId: Int? = view.getTag(R.id.tag_row_id)?.toString()?.toInt()
 
-        rowId?.let { row ->
-            columnId?.let { column ->
-                //обновляем значение в нужной ячейке
-                val columnView = getCellView(row, column)
-                columnView?.findViewById<TextView>(R.id.table_data_item)?.text = value
+        //обходим все поля ввода
+        for (ind in 0 until view.childCount) {
+            val item = view.getChildAt(ind)
+            val editText = item.findViewById<EditText>(R.id.edit_value)
+            val columnId: Int? = editText.getTag(R.id.tag_column_id)?.toString()?.toInt()
+            val value = editText.text.toString()
 
-                presenter.updateValue(row, column, value)
+            rowId?.let { row ->
+                columnId?.let { column ->
+                    //обновляем значение в нужной ячейке
+                    val columnView = getCellView(row, column)
+                    columnView?.findViewById<TextView>(R.id.table_data_item)?.text = value
+
+                    presenter.updateValue(row, column, value)
+                }
             }
         }
     }
@@ -363,5 +337,64 @@ class ScrollTableView: RelativeLayout, ViewListener {
             view.findViewById<TextView>(R.id.table_data_item)?.isEnabled = !isDeleted
             view.isClickable = !isDeleted
         }
+    }
+
+    /** Обработка клика по значению строки */
+    private fun cellClickListener(
+        rowId: Int,
+        header: RowCell?,
+        row: RowCell,
+        countColumns: Int) = OnClickListener { v ->
+        inflater?.let {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            val viewDialog = it.inflate(R.layout.dialog_edit_view, null)
+            val block = viewDialog.findViewById<LinearLayout>(R.id.edit_value_block)
+            block.setTag(R.id.tag_row_id, rowId)
+            for (columnId in 0 until countColumns) {
+                if (columnId <= row.columns.size) {
+                    val cell = row.columns[columnId]
+                    val view = it.inflate(R.layout.item_edit_view, null)
+                    val textEdit: EditText = view.findViewById(R.id.edit_value)
+                    //задаем заголовок
+                    header?.columns?.get(columnId)?.value?.let { title ->
+                        view.findViewById<TextInputLayout>(R.id.input_value).hint = title
+                    }
+                    //задаем значение
+                    when (cell.viewed) {
+                        //ячейка для чтения
+                        CellView.ONLY_READ -> {
+                            textEdit.isEnabled = false
+                            textEdit.setText(cell.value)
+                        }
+
+                        //ячейка должна быть с полем ввода числа
+                        CellView.EDIT_NUMBER -> {
+                            textEdit.inputType = InputType.TYPE_CLASS_NUMBER
+                            cell.value?.let { cellValue ->
+                                val valueCheck: String? = try {
+                                    //небольшая проверка на то, что у нас реально число
+                                    cellValue.toFloat().toString()
+                                } catch (e: Exception) {
+                                    null
+                                }
+                                textEdit.setText(valueCheck)
+                            }
+                        }
+
+                        //ячейка должна быть с полем ввода текста
+                        else -> textEdit.setText(cell.value)
+                    }
+
+                    //задаем параметры, чтобы потом по ним обновить данные в таблице
+                    textEdit.setTag(R.id.tag_column_id, columnId)
+                    block.addView(view)
+                }
+            }
+
+            builder.setView(viewDialog)
+            //настраиваем кнопки и показываем диалог
+            showDialog(builder, block)
+        }
+
     }
 }

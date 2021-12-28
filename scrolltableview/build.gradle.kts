@@ -74,6 +74,8 @@ afterEvaluate {
                 artifactId = Publish.ARTIFACT_ID
                 version = Publish.VERSION
 
+                from(components["release"])
+
                 artifact(sourcesJar)
                 artifact(javadocJar)
                 //artifact(dokkaJar)
@@ -99,8 +101,6 @@ afterEvaluate {
                     }
 
                     scm {
-                        connection.set("scm:github.com/ekiryushin/ScrollTableView.git")
-                        developerConnection.set("scm:git:ssh://github.com/ekiryushin/ScrollTableView.git")
                         url.set("https://github.com/ekiryushin/ScrollTableView")
                     }
                 }
@@ -108,14 +108,6 @@ afterEvaluate {
         }
 
         repositories {
-            maven {
-                name = "sonatype"
-                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                credentials {
-                    username = props.getProperty("ossrhUsername")
-                    password = props.getProperty("ossrhPassword")
-                }
-            }
             maven {
                 name = "sonatypeStaging"
                 url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
@@ -134,4 +126,5 @@ afterEvaluate {
 
 dependencies {
     implementation("androidx.core:core-ktx:${Version.KOTLIN_CORE}")
+    implementation("com.google.android.material:material:${Version.MATERIAL}")
 }

@@ -1,4 +1,4 @@
-package com.github.ekiryushin.scrolltableview.cell
+package io.github.ekiryushin.scrolltableview.cell
 
 /** Одна строка со значениями. */
 data class RowCell(
