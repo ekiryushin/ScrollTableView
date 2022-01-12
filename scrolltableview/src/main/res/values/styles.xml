@@ -1,0 +1,4 @@
+<resources>
+    <!-- стиль календаря-->
+    <style name="STVDatePickerStyleDialog" parent="android:Theme.Material.Dialog"/>
+</resources>

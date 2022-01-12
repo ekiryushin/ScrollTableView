@@ -6,5 +6,5 @@
     android:gravity="center"
     android:layout_gravity="center"
     android:textStyle="bold"
-    android:textSize="@dimen/card_text_size"
-    android:padding="@dimen/content_padding"/>
+    android:textSize="@dimen/stv_card_text_size"
+    android:padding="@dimen/stv_content_padding"/>

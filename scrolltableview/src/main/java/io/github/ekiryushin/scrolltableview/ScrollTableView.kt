@@ -2,26 +2,26 @@ package io.github.ekiryushin.scrolltableview
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.content.Context
-import android.text.InputType
+import android.content.DialogInterface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import com.google.android.material.textfield.TextInputLayout
-import io.github.ekiryushin.scrolltableview.cell.CellView
 import io.github.ekiryushin.scrolltableview.cell.RowCell
 import io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView
 import io.github.ekiryushin.scrolltableview.scrolled.OnScrollListener
 import io.github.ekiryushin.scrolltableview.scrolled.ScrollTableParams
 import io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView
+import java.util.*
 
 /** Основной класс по отображения таблицы. */
 class ScrollTableView: RelativeLayout, ViewListener {
     constructor(context: Context): super(context)
     constructor(context: Context, attrs: AttributeSet): super(context, attrs) {
         inflater = (context as Activity).layoutInflater
-        inflater?.inflate(R.layout.scroll_table_view, this, true)
+        inflater?.inflate(R.layout.stv_scroll_table_view, this, true)
 
         //считываем параметры
         init()
@@ -32,25 +32,25 @@ class ScrollTableView: RelativeLayout, ViewListener {
 
     private var inflater: LayoutInflater? = null
 
-    /** Закрепленная строка заголовка */
+    /** Закрепленная строка заголовка. */
     private lateinit var trHeaderFix: TableRow
 
-    /** Строка заголовка */
+    /** Строка заголовка. */
     private lateinit var trHeader: TableRow
 
-    /** Закрепленые столбцы */
+    /** Закрепленые столбцы. */
     private lateinit var tableFix: TableLayout
 
-    /** Основная таблица */
+    /** Основная таблица. */
     private lateinit var tableData: TableLayout
 
-    /** Презентер отображения таблицв */
+    /** Презентер отображения таблиц. */
     private lateinit var presenter: ScrollTableViewPresenter
 
-    /** Параметры отображения таблицы */
+    /** Параметры отображения таблицы. */
     private var params: ScrollTableParams = ScrollTableParams()
 
-    /** Отрисовать таблицу */
+    /** Отрисовать таблицу. */
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
 
@@ -66,29 +66,21 @@ class ScrollTableView: RelativeLayout, ViewListener {
     }
 
     /** Задать обработчик клика по строке.
-     * @param rowId индекс строки в данных, где расположена ячейка
-     * @param columnId индекс столбца в данных, где расположена ячейка
-     * @param header заголовок таблицы
-     * @param row строка со значениями для редактирования
-     * @param countColumns количество колонок в таблице
-     * @param view непосредственно ячейка, по которой нажали
+     * @param rowId индекс строки в данных, где расположена ячейка.
+     * @param columnId индекс столбца в данных, где расположена ячейка.
+     * @param row строка со значениями для редактирования.
+     * @param view непосредственно ячейка, по которой нажали.
      */
-    override fun setRowClickListener(
-        rowId: Int,
-        columnId: Int,
-        header: RowCell?,
-        row: RowCell?,
-        countColumns: Int,
-        view: View?) {
+    override fun setRowClickListener(rowId: Int, columnId: Int, row: RowCell?, view: View?) {
         row?.let {
             val curView = view ?: getCellView(rowId, columnId)
-            curView?.setOnClickListener(cellClickListener(rowId, header, it, countColumns))
+            curView?.setOnClickListener(cellClickListener(rowId))
         }
     }
 
     /** Установить фон строки в зависимости от того удалена она или нет.
-     * @param changeRowId индекс измененной строки
-     * @param isDeleted true строка удаленная, false - строка восстановленная
+     * @param changeRowId индекс измененной строки.
+     * @param isDeleted true строка удаленная, false - строка восстановленная.
      */
     override fun setRowBackground(changeRowId: Int, isDeleted: Boolean) {
         //получаем строку закрепленных колонок
@@ -113,9 +105,9 @@ class ScrollTableView: RelativeLayout, ViewListener {
     }
 
     /** Установить фон ячейки, если значение в ней измененное
-     * @param changeRowId индекс строки, в которой изменилось значение
-     * @param changeColumnId индекст колонки, в которой изменилось значение
-     * @param isEdited true - значение изменилось на новое, false - значение изменилось в исходное
+     * @param changeRowId индекс строки, в которой изменилось значение.
+     * @param changeColumnId индекст колонки, в которой изменилось значение.
+     * @param isEdited true - значение изменилось на новое, false - значение изменилось в исходное.
      */
     override fun setCellBackground(changeRowId: Int, changeColumnId: Int, isEdited: Boolean) {
         val columnView = getCellView(changeRowId, changeColumnId)
@@ -130,28 +122,105 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Прокрутить список вниз */
+    /** Прокрутить список вниз. */
     override fun scrollToEnd() {
         val scrollRowData: VerticalScrollTableView = this.findViewById(R.id.table_data_scroll_row_data)
         scrollRowData.post { scrollRowData.fullScroll(ScrollView.FOCUS_DOWN) }
     }
 
-    /** Задать список заголовков.
-     * @param headers строка, содержащая ячейки для каждого столбца заголовка
+    /**
+     * Показать окно для изменения значения.
+     * @param builder подготовленное диалоговое окно.
+     * @param view разметка, содержащая все поля ввода.
      */
-    fun setHeaders(headers: RowCell) {
-        presenter.setHeaders(headers)
+    override fun showDialog(builder: AlertDialog.Builder, view: LinearLayout) {
+        builder
+            .setCancelable(false)
+            .setTitle(R.string.stv_edit_title)
+            .setPositiveButton(context.getString(R.string.stv_button_success)) { _, _ -> applyDialog(view) }
+            .setNegativeButton(context.getString(R.string.stv_button_cancel)) { dialog, _ ->
+                cancelDialog(dialog, view)
+            }
+            .create()
+            .show()
     }
 
-    /** Задать таблицу с данными без заголовка
-     * @param data список из строк, содержащих ячейки для каждого столбца
+    /**
+     * Показать окно выбора даты.
+     * @param editText поле ввода, для которого нужно показать окно.
+     * @param gregorianCalendar дата, которую нужно выделить в календаре.
+     */
+    override fun showDialogSelectDate(editText: EditText, gregorianCalendar: GregorianCalendar) {
+        DatePickerDialog(
+            context,
+            params.dialogStyleId,
+            { _, year, monthOfYear, dayOfMonth ->
+                val selectedDate = String.format("%02d.%02d.%04d", dayOfMonth, monthOfYear+1, year)
+                editText.setText(selectedDate)
+            },
+            gregorianCalendar.get(Calendar.YEAR),
+            gregorianCalendar.get(Calendar.MONTH),
+            gregorianCalendar.get(Calendar.DAY_OF_MONTH))
+            .show()
+    }
+
+    /**
+     * Удалить конкретную строку.
+     * @param rowId идентификатор строки для удаления.
+     */
+    override fun removeRow(rowId: Int) {
+        if (rowId < tableFix.childCount) {
+            tableFix.removeView(tableFix.getChildAt(rowId))
+        }
+        if (rowId < tableData.childCount) {
+            tableData.removeView(tableData.getChildAt(rowId))
+        }
+    }
+
+    /** Задать список заголовков.
+     * @param header строка, содержащая ячейки для каждого столбца заголовка.
+     */
+    fun setHeader(header: RowCell) {
+        presenter.setHeader(header)
+    }
+
+    /** Задать таблицу с данными без заголовка.
+     * @param data список из строк, содержащих ячейки для каждого столбца.
      */
     fun setData(data: MutableList<RowCell>) {
         presenter.setData(data)
     }
 
+    /** Задать количество закрепленных столбцов.
+     * @param countFixColumn количество столбцов слева, которые не будут прокручиваться.
+     */
+    fun setCountFixColumn(countFixColumn: Int) {
+        params.countFixColumn = countFixColumn
+    }
+
+    /** Включить или выключить отображение иконок удаления и восстановления.
+     * @param enabledIconDelete true - включить отображение иконок, false - выключить.
+     */
+    fun setEnabledIconDelete(enabledIconDelete: Boolean) {
+        params.enabledIconDelete = enabledIconDelete
+    }
+
+    /** Задать цвет измененной ячейки.
+     * resourceId - ссылка на цветовой ресурс.
+     */
+    fun setEditedCellColorResourceId(resourceId: Int) {
+        params.cellEditedColorResId = resourceId
+    }
+
+    /** Задать стиль оформления диалогового окна выбора даты.
+     * styleId - ссылка на стиль.
+     */
+    fun setDialogSelectDateStyleId(styleId: Int) {
+        params.dialogStyleId = styleId
+    }
+
     /** Добавить строку с данными.
-     * @param row новая строка, содержащая ячейки для каждого столбца
+     * @param row новая строка, содержащая ячейки для каждого столбца.
      */
     fun addRowData(row: RowCell) {
         inflater?.let {
@@ -159,33 +228,7 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Получить все данные.
-     * @return список строк, содержащих значения по каждому столбцу
-     */
-    fun getData() = presenter.getData()
-
-    /** Задать количество закрепленных столбцов.
-     * @param countFixColumn количество столбцов слева, которые не будут прокручиваться
-     */
-    fun setCountFixColumn(countFixColumn: Int) {
-        params.countFixColumn = countFixColumn
-    }
-
-    /** Включить или выключить отображение иконок удаления и восстановления.
-     * @param enabledIconDelete true - включить отображение иконок, false - выключить
-     */
-    fun setEnabledIconDelete(enabledIconDelete: Boolean) {
-        params.enabledIconDelete = enabledIconDelete
-    }
-
-    /** Задать цвет измененной ячейки
-     * resourceId - ссылка на цветовой ресурс
-     */
-    fun setEditedCellColorResourceId(resourceId: Int) {
-        params.cellEditedColorResId = resourceId
-    }
-
-    /** Построить таблицу с данными */
+    /** Построить таблицу с данными. */
     fun showTable() {
         //закрепленная строка заголовка
         trHeaderFix.removeAllViews()
@@ -202,7 +245,12 @@ class ScrollTableView: RelativeLayout, ViewListener {
         inflater?.let { presenter.showTable(it, trHeaderFix, trHeader, tableFix, tableData) }
     }
 
-    /** Инициализация переменных */
+    /** Получить все данные.
+     * @return список строк, содержащих значения по каждому столбцу.
+     */
+    fun getData() = presenter.getData()
+
+    /** Инициализация переменных. */
     private fun init() {
         trHeaderFix = this.findViewById(R.id.table_data_tr_fix_header)
         trHeader = this.findViewById(R.id.table_data_tr_header)
@@ -212,7 +260,7 @@ class ScrollTableView: RelativeLayout, ViewListener {
         presenter = ScrollTableViewPresenter(params, this)
     }
 
-    /** Подключить слушатели изменения скролла */
+    /** Подключить слушатели изменения скролла. */
     private fun setListener() {
         val scrollHeader: HorizontalScrollTableView = this.findViewById(R.id.table_data_scroll_header)
         val scrollColumnData: HorizontalScrollTableView = this.findViewById(R.id.table_data_scroll_column_data)
@@ -242,34 +290,18 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Показать окно для изменения значения */
-    private fun showDialog(builder: AlertDialog.Builder, view: LinearLayout) {
-        builder
-            .setCancelable(false)
-            .setTitle(R.string.edit_title)
-            .setPositiveButton(
-                context.getString(R.string.button_success)
-            ) { _, _ -> applyDialog(view) }
-            .setNegativeButton(
-                context.getString(R.string.button_cancel)
-            ) { dialog, _ -> dialog.cancel() }
-            .create()
-            .show()
-    }
-
-    /** Сохранение значения */
+    /** Сохранение значения. */
     private fun applyDialog(view: LinearLayout) {
-        //получаем координаты ячейки в таблице
-        val rowId: Int? = view.getTag(R.id.tag_row_id)?.toString()?.toInt()
+        //получаем координаты строки в таблице
+        val rowId: Int? = view.getTag(R.id.stv_tag_row_id)?.toString()?.toInt()
 
         //обходим все поля ввода
-        for (ind in 0 until view.childCount) {
-            val item = view.getChildAt(ind)
-            val editText = item.findViewById<EditText>(R.id.edit_value)
-            val columnId: Int? = editText.getTag(R.id.tag_column_id)?.toString()?.toInt()
-            val value = editText.text.toString()
-
-            rowId?.let { row ->
+        rowId?.let { row ->
+            for (ind in 0 until view.childCount) {
+                val item = view.getChildAt(ind)
+                val editText = item.findViewById<EditText>(R.id.edit_value)
+                val columnId: Int? = editText.getTag(R.id.stv_tag_column_id)?.toString()?.toInt()
+                val value = editText.text.toString()
                 columnId?.let { column ->
                     //обновляем значение в нужной ячейке
                     val columnView = getCellView(row, column)
@@ -281,7 +313,15 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Найти нужную ячейку */
+    /** Отмена значений. */
+    private fun cancelDialog(dialog: DialogInterface, view: LinearLayout) {
+        //получаем координаты строки в таблице
+        val rowId: Int? = view.getTag(R.id.stv_tag_row_id)?.toString()?.toInt()
+        rowId?.let { presenter.canceledChangeValues(it) }
+        dialog.cancel()
+    }
+
+    /** Найти нужную ячейку. */
     private fun getCellView(rowId: Int, columnId: Int): View? {
         var id = columnId
         var table: TableLayout = tableFix
@@ -306,7 +346,7 @@ class ScrollTableView: RelativeLayout, ViewListener {
         return  null
     }
 
-    /** Синхронизировать размеры столбцов заголовка cо столбцами таблицы */
+    /** Синхронизировать размеры столбцов заголовка cо столбцами таблицы. */
     private fun updateColumnWidth(trHeader: TableRow, trFirst: TableRow?) {
         trFirst?.let { first ->
             for (columnId in 0 until trHeader.childCount) {
@@ -322,10 +362,10 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Пометить строку удаленной или восстановленной */
+    /** Пометить строку удаленной или восстановленной. */
     private fun setRowEnabled(tableRow: TableRow, isDeleted: Boolean) {
         if (isDeleted) {
-            tableRow.setBackgroundResource(R.color.row_delete_color)
+            tableRow.setBackgroundResource(R.color.stv_row_delete_color)
         }
         else {
             tableRow.background = null
@@ -339,62 +379,11 @@ class ScrollTableView: RelativeLayout, ViewListener {
         }
     }
 
-    /** Обработка клика по значению строки */
-    private fun cellClickListener(
-        rowId: Int,
-        header: RowCell?,
-        row: RowCell,
-        countColumns: Int) = OnClickListener { v ->
-        inflater?.let {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-            val viewDialog = it.inflate(R.layout.dialog_edit_view, null)
-            val block = viewDialog.findViewById<LinearLayout>(R.id.edit_value_block)
-            block.setTag(R.id.tag_row_id, rowId)
-            for (columnId in 0 until countColumns) {
-                if (columnId <= row.columns.size) {
-                    val cell = row.columns[columnId]
-                    val view = it.inflate(R.layout.item_edit_view, null)
-                    val textEdit: EditText = view.findViewById(R.id.edit_value)
-                    //задаем заголовок
-                    header?.columns?.get(columnId)?.value?.let { title ->
-                        view.findViewById<TextInputLayout>(R.id.input_value).hint = title
-                    }
-                    //задаем значение
-                    when (cell.viewed) {
-                        //ячейка для чтения
-                        CellView.ONLY_READ -> {
-                            textEdit.isEnabled = false
-                            textEdit.setText(cell.value)
-                        }
-
-                        //ячейка должна быть с полем ввода числа
-                        CellView.EDIT_NUMBER -> {
-                            textEdit.inputType = InputType.TYPE_CLASS_NUMBER
-                            cell.value?.let { cellValue ->
-                                val valueCheck: String? = try {
-                                    //небольшая проверка на то, что у нас реально число
-                                    cellValue.toFloat().toString()
-                                } catch (e: Exception) {
-                                    null
-                                }
-                                textEdit.setText(valueCheck)
-                            }
-                        }
-
-                        //ячейка должна быть с полем ввода текста
-                        else -> textEdit.setText(cell.value)
-                    }
-
-                    //задаем параметры, чтобы потом по ним обновить данные в таблице
-                    textEdit.setTag(R.id.tag_column_id, columnId)
-                    block.addView(view)
-                }
+    /** Обработка клика по значению строки. */
+    private fun cellClickListener(rowId: Int) =
+        OnClickListener { _ ->
+            inflater?.let {
+                presenter.builderEditDialog(context, it, rowId)
             }
-
-            builder.setView(viewDialog)
-            //настраиваем кнопки и показываем диалог
-            showDialog(builder, block)
-        }
-
     }
 }

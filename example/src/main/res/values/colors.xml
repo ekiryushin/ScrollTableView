@@ -8,9 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-
-
-    <color name="edited">#E1AE14</color>
-
-
+    <color name="edited">#86BF00</color>
+    <color name="date_background">#515151</color>
 </resources>

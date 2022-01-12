@@ -1,8 +1,13 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.ekiryushin/scrolltableview/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.ekiryushin/scrolltableview)
 
 # ScrollTableView
-Отображение данных в виде прокручиваемой таблицы. С возможностью закрепления шапки таблицы и нескольких колонок слева. Измененные значения, добавленные или удаленные строки помечаются специальным статусом. Благодаря ему можно без труда обработать только те данные, что добавил, изменил или удалил пользователь.<br>
-<img src="https://github.com/ekiryushin/ScrollTableView/blob/master/example/preview.gif" style="width: 50%" />
+Отображение данных в виде прокручиваемой таблицы. С возможностью закрепления шапки таблицы
+и нескольких колонок слева. Измененные значения, добавленные или удаленные строки помечаются
+специальным статусом. Благодаря ему можно без труда обработать только те данные, что добавил,
+изменил или удалил пользователь.<br>
++ [Документация](docs/documentation.md)<br>
++ [История изменений](docs/history.md)<br>
+<img src="https://github.com/ekiryushin/ScrollTableView/blob/master/docs/preview.gif" style="width: 50%" />
 
 # Подключение
 В `build.gradle` приложения подключаем центральный репозиторий
@@ -16,7 +21,7 @@ allprojects {
 В зависимостях `build.gradle` нужного модуля подключаем данную библиотеку
 ```groovy
 dependencies {
-    implementation 'io.github.ekiryushin:scrolltableview:1.0.2'
+    implementation 'io.github.ekiryushin:scrolltableview:1.0.3'
 }
 ```
 
@@ -33,28 +38,36 @@ dependencies {
 //сформируем шапку таблицы, если нужно
 val columns: MutableList<Cell> = mutableListOf()
 var id: Long = 1
-columns.add(Cell(id = 0, value = "Дата"))
+columns.add(Cell(id = id++, value = "Чтение"))
+columns.add(Cell(id = id++, value = "Строковое"))
+columns.add(Cell(id = id++, value = "Дата"))
 for (ind in 1..10) {
-    columns.add(Cell(id = id++, value = "Значение $ind"))
+    columns.add(Cell(id = id++, value = "Числовое $ind"))
 }
 val header = RowCell(columns)
 
 //сформируем основные данные для отображения
 val data: MutableList<RowCell> = mutableListOf()
-for (ind in 10..31) {
+for (ind in 1..30) {
     val columnsData: MutableList<Cell> = mutableListOf()
-    //добавляем колонку со значением для "Дата"
-    columnsData.add(Cell(id = id++, value = "$ind.10.2021", viewed = CellView.EDIT_STRING))
+    //добавляем колонку с данными только для чтения
+    columnsData.add(Cell(id = id++, value = "$ind"))
+    //добавляем колонку со строковым значением
+    columnsData.add(Cell(id = id++, value = "Строка #$ind", viewed = CellView.EDIT_STRING))
+    //добавляем колонку с датой
+    val dateValue = String.format("%02d.01.2022", ind)
+    columnsData.add(Cell(id = id++, value = dateValue, viewed = CellView.EDIT_DD_MM_YYYY))
     //добавляем колонки с остальными значениями
     for (indV in 1..10) {
-        columnsData.add(Cell(id = id++, value = (10..25).random().toFloat().toString(), viewed = CellView.EDIT_NUMBER))
+        val value = (10..200).random().toFloat().toString()
+        columnsData.add(Cell(id = id++, value = value, viewed = CellView.EDIT_NUMBER))
     }
     data.add(RowCell(columnsData))
 }
 
 //передаем сформированные данные
 with(binding.tableDataBlock) {
-    setHeaders(header)
+    setHeader(header)
     setData(data)
 }
 
@@ -63,9 +76,11 @@ with(binding.tableDataBlock) {
     //отображать или нет столбец с иконками удаления/восстановления строки
     setEnabledIconDelete(true)
     //количество закрепленных столбцов слева (не будут прокручиваться по горизонтале)
-    setCountFixColumn(1)
+    setCountFixColumn(2)
     //цвет выделения ячеек, в которых есть изменения
     setEditedCellColorResourceId(R.color.edited)
+    //стиль офрмления диалогового окна выбора даты
+    setDialogSelectDateStyleId(R.style.styleDialogSelectDate)
     showTable()
 }
 ```
@@ -73,7 +88,9 @@ with(binding.tableDataBlock) {
 ```kotlin
 //сформируем пустую строку
 val columns: MutableList<Cell> = mutableListOf()
+columns.add(Cell())
 columns.add(Cell(viewed = CellView.EDIT_STRING))
+columns.add(Cell(viewed = CellView.EDIT_DD_MM_YYYY))
 for (ind in 1..10) {
     columns.add(Cell(viewed = CellView.EDIT_NUMBER))
 }
@@ -84,6 +101,11 @@ binding.tableDataBlock.addRowData(RowCell(columns))
 val editedData = binding.tableDataBlock.getData()?.filter { row ->
     row.status == DataStatus.ADD || row.status == DataStatus.DELETE
         || row.columns.any { column -> column.status == DataStatus.EDIT }
+}
+//в строках, где поменялись значения, оставим только измененные значения
+editedDate?.filter { row -> row.status == DataStatus.NORMAL }
+    ?.forEach { row ->
+        row.columns = row.columns.filter { column -> column.status == DataStatus.EDIT }
 }
 ```
 

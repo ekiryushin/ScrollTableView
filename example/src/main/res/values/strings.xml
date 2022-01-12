@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ScrollTableView</string>
     <string name="button_add">Добавить строку</string>
+    <string name="button_log">в логи</string>
 </resources>
