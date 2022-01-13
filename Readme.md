@@ -101,7 +101,6 @@ binding.tableDataBlock.addRowData(RowCell(columns))
 Получить заголовок таблицы
 ```kotlin
 binding.tableDataBlock.getHeader()
-}
 ```
 Получить все добавленные, удаленные строки или строки, в которых менялись значения
 ```kotlin
