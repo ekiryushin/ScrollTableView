@@ -7,7 +7,7 @@
 изменил или удалил пользователь.<br>
 + [Документация](docs/documentation.md)<br>
 + [История изменений](docs/history.md)<br>
-<img src="https://github.com/ekiryushin/ScrollTableView/blob/master/docs/preview.gif" style="width: 50%" />
+<img src="https://github.com/ekiryushin/ScrollTableView/blob/master/docs/preview.gif" style="width: 30%" />
 
 # Подключение
 В `build.gradle` приложения подключаем центральный репозиторий
