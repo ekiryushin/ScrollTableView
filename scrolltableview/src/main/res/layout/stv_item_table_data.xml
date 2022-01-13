@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="@dimen/content_padding">
+    android:padding="@dimen/stv_content_padding">
     <TextView
         android:id="@+id/table_data_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textSize="@dimen/card_text_size"
-        android:padding="@dimen/content_padding_mini"/>
+        android:textSize="@dimen/stv_card_text_size"
+        android:padding="@dimen/stv_content_padding_mini"/>
 </LinearLayout>

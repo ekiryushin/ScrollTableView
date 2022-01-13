@@ -4,11 +4,11 @@
         android:id="@+id/table_data_table_fix_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:divider="@color/dived_color"
+        android:divider="@color/stv_dived_color"
         android:showDividers="middle">
         <TableRow
             android:id="@+id/table_data_tr_fix_header"
-            android:divider="@color/dived_color"
+            android:divider="@color/stv_dived_color"
             android:showDividers="middle"/>
     </TableLayout>
 
@@ -23,11 +23,11 @@
             android:id="@+id/table_data_table_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:divider="@color/dived_color"
+            android:divider="@color/stv_dived_color"
             android:showDividers="middle">
             <TableRow
                 android:id="@+id/table_data_tr_header"
-                android:divider="@color/dived_color"
+                android:divider="@color/stv_dived_color"
                 android:showDividers="middle"/>
         </TableLayout>
     </io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView>
@@ -43,7 +43,7 @@
             android:id="@+id/table_data_table_fix"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:divider="@color/dived_color"
+            android:divider="@color/stv_dived_color"
             android:showDividers="middle"/>
     </io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView>
 
@@ -62,7 +62,7 @@
                 android:id="@+id/table_data_table_value"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:divider="@color/dived_color"
+                android:divider="@color/stv_dived_color"
                 android:showDividers="middle"/>
         </io.github.ekiryushin.scrolltableview.scrolled.HorizontalScrollTableView>
     </io.github.ekiryushin.scrolltableview.scrolled.VerticalScrollTableView>

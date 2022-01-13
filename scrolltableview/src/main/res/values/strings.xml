@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="edit_title">Редактирование</string>
-    <string name="button_success">Сохранить</string>
-    <string name="button_cancel">Отмена</string>
-    <string name="default_hint">Значение</string>
+    <string name="stv_edit_title">Редактирование</string>
+    <string name="stv_button_success">ОК</string>
+    <string name="stv_button_cancel">Отмена</string>
+    <string name="stv_default_hint">Значение</string>
 </resources>

@@ -1,0 +1,8 @@
+<resources>
+    <!-- стиль окна выбора даты -->
+    <style name="styleDialogSelectDate" parent="android:Theme.Material.Dialog">
+        <item name="android:textColorPrimary">@color/teal_200</item>
+        <item name="android:textColorSecondary">@color/purple_700</item>
+        <item name="android:colorBackground">@color/date_background</item>
+    </style>
+</resources>
