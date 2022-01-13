@@ -33,5 +33,5 @@ object Module {
 object Publish {
     const val GROUP_ID = "io.github.ekiryushin"
     const val ARTIFACT_ID = "scrolltableview"
-    const val VERSION = "1.0.3"
+    const val VERSION = "1.0.4"
 }

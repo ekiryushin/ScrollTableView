@@ -1,8 +1,12 @@
 # История изменений
 
++ [1.0.4](#104)
 + [1.0.3](#103)
 + [1.0.2](#102)
 + [1.0.1](#101)
+
+## 1.0.4
++ Добавлен геттер [getHeader()](documentation.md#scrolltableview) заголовка таблицы.
 
 ## 1.0.3
 + К типу ячейки добавлены форматы [CellView.EDIT_DD_MM_YYYY](documentation.md#cellview) и [CellView.EDIT_TIMESTAMP](documentation.md#cellview) для редактирования даты путем выбора ее из календаря.

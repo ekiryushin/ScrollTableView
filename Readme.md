@@ -21,7 +21,7 @@ allprojects {
 В зависимостях `build.gradle` нужного модуля подключаем данную библиотеку
 ```groovy
 dependencies {
-    implementation 'io.github.ekiryushin:scrolltableview:1.0.3'
+    implementation 'io.github.ekiryushin:scrolltableview:1.0.4'
 }
 ```
 
@@ -33,9 +33,8 @@ dependencies {
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>
 ```
-В коде формируем структуру таблицы
+В коде формируем шапку таблицы, если нужно
 ```kotlin
-//сформируем шапку таблицы, если нужно
 val columns: MutableList<Cell> = mutableListOf()
 var id: Long = 1
 columns.add(Cell(id = id++, value = "Чтение"))
@@ -45,8 +44,9 @@ for (ind in 1..10) {
     columns.add(Cell(id = id++, value = "Числовое $ind"))
 }
 val header = RowCell(columns)
-
-//сформируем основные данные для отображения
+```
+Далее формируем основные данные
+```kotlin
 val data: MutableList<RowCell> = mutableListOf()
 for (ind in 1..30) {
     val columnsData: MutableList<Cell> = mutableListOf()
@@ -64,14 +64,16 @@ for (ind in 1..30) {
     }
     data.add(RowCell(columnsData))
 }
-
-//передаем сформированные данные
+```
+Передаем сформированные данные
+```kotlin
 with(binding.tableDataBlock) {
     setHeader(header)
     setData(data)
 }
-
-//настраиваем внешний вид и отображаем таблицу
+```
+Настраиваем внешний вид и отображаем таблицу
+```kotlin
 with(binding.tableDataBlock) {
     //отображать или нет столбец с иконками удаления/восстановления строки
     setEnabledIconDelete(true)
@@ -95,6 +97,11 @@ for (ind in 1..10) {
     columns.add(Cell(viewed = CellView.EDIT_NUMBER))
 }
 binding.tableDataBlock.addRowData(RowCell(columns))
+```
+Получить заголовок таблицы
+```kotlin
+binding.tableDataBlock.getHeader()
+}
 ```
 Получить все добавленные, удаленные строки или строки, в которых менялись значения
 ```kotlin

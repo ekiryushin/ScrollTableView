@@ -144,7 +144,14 @@ class ScrollTableViewPresenter (
         }
     }
 
-    //получить все данные
+    /** Получить все данные.
+     * @return список строк, содержащих значения по каждому столбцу.
+     */
+    fun getHeader() = header?.copy()
+
+    /** Получить все данные.
+     * @return список строк, содержащих значения по каждому столбцу.
+     */
     fun getData() = data?.map { row -> row.copy() }?.toList()
 
     /**

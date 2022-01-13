@@ -54,7 +54,6 @@ val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
 artifacts {
     archives(sourcesJar)
     archives(javadocJar)
-    //archives(dokkaJar)
 }
 
 val props = Properties().apply {
@@ -78,11 +77,14 @@ afterEvaluate {
 
                 artifact(sourcesJar)
                 artifact(javadocJar)
-                //artifact(dokkaJar)
 
                 pom {
                     name.set("ScrollTableView")
-                    description.set("Прокручиваемая таблица для Android-приложений")
+                    description.set("ScrollTableView - это Android-библиоткека для отображение данных в виде прокручиваемой таблицы. "
+                            + "С возможностью закрепления шапки таблицы и нескольких колонок слева. "
+                            + "Измененные значения, добавленные или удаленные строки помечаются специальным статусом. "
+                            + "Благодаря ему можно без труда обработать только те данные, "
+                            + "которые добавил, изменил или удалил пользователь.")
                     url.set("https://github.com/ekiryushin/ScrollTableView")
 
                     licenses {

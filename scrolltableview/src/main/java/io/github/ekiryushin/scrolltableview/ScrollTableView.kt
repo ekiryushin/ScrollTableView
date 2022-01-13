@@ -245,6 +245,11 @@ class ScrollTableView: RelativeLayout, ViewListener {
         inflater?.let { presenter.showTable(it, trHeaderFix, trHeader, tableFix, tableData) }
     }
 
+    /** Получить заголовок таблицы.
+     * @return строка, содержащая значения по каждому заголовку таблицы.
+     */
+    fun getHeader() = presenter.getHeader()
+
     /** Получить все данные.
      * @return список строк, содержащих значения по каждому столбцу.
      */
