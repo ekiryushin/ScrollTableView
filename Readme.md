@@ -1,6 +1,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.ekiryushin/scrolltableview/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.ekiryushin/scrolltableview)
 
 # ScrollTableView
+Библиотека не очень удачная. Плохо работает с большим объемом данных.
+
 Отображение данных в виде прокручиваемой таблицы. С возможностью закрепления шапки таблицы
 и нескольких колонок слева. Измененные значения, добавленные или удаленные строки помечаются
 специальным статусом. Благодаря ему можно без труда обработать только те данные, что добавил,
